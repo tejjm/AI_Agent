@@ -1,14 +1,15 @@
-def main():
-    print("Hello from ai-agent!")
+# def main():
+#     print("Hello from ai-agent!")
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
 import os
 import argparse
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from prompts import system_prompt
 
 load_dotenv()
 
@@ -29,7 +30,8 @@ messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)]
 
 response = client.models.generate_content(
     model="gemini-2.5-flash",
-    contents = messages
+    contents = messages,
+    config = types.GenerateContentConfig(system_instruction=system_prompt, temperature=0),
 )
 
 if response.usage_metadata is None:
