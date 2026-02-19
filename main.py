@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 from prompts import system_prompt
+from call_function import available_functions
 
 load_dotenv()
 
@@ -31,7 +32,7 @@ messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)]
 response = client.models.generate_content(
     model="gemini-2.5-flash",
     contents = messages,
-    config = types.GenerateContentConfig(system_instruction=system_prompt, temperature=0),
+    config = types.GenerateContentConfig(system_instruction=system_prompt,tools=[available_functions], temperature=0),
 )
 
 if response.usage_metadata is None:
