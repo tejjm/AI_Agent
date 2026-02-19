@@ -1,4 +1,5 @@
 import os
+from google.genai import types
 def get_files_info(working_directory, directory="."):
     lines = []
 
@@ -26,3 +27,4 @@ def get_files_info(working_directory, directory="."):
         return f"Error: {e}"
     
     return "\n".join(lines)
+
