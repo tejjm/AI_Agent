@@ -29,32 +29,36 @@ args = parser.parse_args()
 #Saving the user prompt to a list 
 messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
 
-response = client.models.generate_content(
-    model="gemini-2.5-flash",
-    contents = messages,
-    config = types.GenerateContentConfig(system_instruction=system_prompt,tools=[available_functions], temperature=0),
-)
+#Putting the response part in a loop creating a feedback loop for the agent
 
-if response.usage_metadata is None:
-    raise RuntimeError("Error homie")
-if args.verbose:
-    print(f"User prompt: {args.user_prompt}")
-    print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-    print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+for _ in range(20):
+        
+    response = client.models.generate_content(
+        model="gemini-2.5-flash",
+        contents = messages,
+        config = types.GenerateContentConfig(system_instruction=system_prompt,tools=[available_functions], temperature=0),
+    )
 
-func_calls = response.function_calls
-if func_calls:
-    result_list = []
-    for function_call in func_calls:
-        function_call_result = call_function(function_call,verbose=args.verbose)
-        if not function_call_result.parts:
-            raise Exception("The result is empty")
-        if function_call_result.parts[0].function_response is None:
-            raise Exception("Result is None")
-        if function_call_result.parts[0].function_response.response is None:
-            raise Exception("Result is None")
-        if args.verbose:
-            print(f"-> {function_call_result.parts[0].function_response.response}")
-        result_list.append(function_call_result.parts[0].function_response.response)
+    if response.usage_metadata is None:
+        raise RuntimeError("Error homie")
+    if args.verbose:
+        print(f"User prompt: {args.user_prompt}")
+        print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+        print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
 
-        # print(f"Calling function: {function_call.name}({function_call.args})")
+    func_calls = response.function_calls
+    if func_calls:
+        result_list = []
+        for function_call in func_calls:
+            function_call_result = call_function(function_call,verbose=args.verbose)
+            if not function_call_result.parts:
+                raise Exception("The result is empty")
+            if function_call_result.parts[0].function_response is None:
+                raise Exception("Result is None")
+            if function_call_result.parts[0].function_response.response is None:
+                raise Exception("Result is None")
+            if args.verbose:
+                print(f"-> {function_call_result.parts[0].function_response.response}")
+            result_list.append(function_call_result.parts[0].function_response.response)
+
+            # print(f"Calling function: {function_call.name}({function_call.args})")
