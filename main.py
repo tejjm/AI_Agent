@@ -38,6 +38,13 @@ for _ in range(20):
         contents = messages,
         config = types.GenerateContentConfig(system_instruction=system_prompt,tools=[available_functions], temperature=0),
     )
+    # Creating candidates so Agent can keep track of reponses
+    response_candidates = response.candidates
+    if response_candidates:
+        for candidate in response_candidates:
+            messages.append(candidate.content)
+
+
 
     if response.usage_metadata is None:
         raise RuntimeError("Error homie")
@@ -59,6 +66,13 @@ for _ in range(20):
                 raise Exception("Result is None")
             if args.verbose:
                 print(f"-> {function_call_result.parts[0].function_response.response}")
-            result_list.append(function_call_result.parts[0].function_response.response)
-
+            result_list.append(function_call_result.parts[0])
+        messages.append(types.Content(role="user", parts=result_list))
+    else:
+        print(response.text)
+        break
+    
             # print(f"Calling function: {function_call.name}({function_call.args})")
+if func_calls:
+    print("Max iterations reached without a final response")
+    exit(1)
