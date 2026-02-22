@@ -1,6 +1,9 @@
 from google.genai import types
 import function_declaration as fd
-import functions as f
+from functions.get_file_content import get_file_content
+from functions.get_files_info import get_files_info
+from functions.run_python_file import run_python_file
+from functions.write_file import write_file
 
 available_functions = types.Tool(
     function_declarations=[fd.schema_get_files_info,
@@ -13,10 +16,10 @@ def call_function(function_call, verbose=False):
         print(f"Calling function: {function_call.name}({function_call.args})")
     else:
         print(f" - Calling function: {function_call.name}")
-    function_map = {"get_file_content":f.get_file_content,
-                    "get_files_info":f.get_files_info,
-                    "run_python_file":f.run_python_file,
-                    "write_file":f.write_file,                    
+    function_map = {"get_file_content":get_file_content,
+                    "get_files_info":get_files_info,
+                    "run_python_file":run_python_file,
+                    "write_file":write_file,                    
                     }
     function_name = function_call.name or ''
     if not function_name in function_map:
